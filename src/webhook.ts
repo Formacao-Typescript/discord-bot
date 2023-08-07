@@ -27,7 +27,7 @@ export async function handleWebhookRequest(_config: Config, request: Request) {
   await storage.events.add(event);
 
   switch (event.event) {
-    case EventType.PurchaseComplete:
+    case EventType.PurchaseApproved:
       await storage.students.preRegister(event.data.buyer.email, event.data.purchase.offer.code);
       break;
     case EventType.PurchaseProtest:
