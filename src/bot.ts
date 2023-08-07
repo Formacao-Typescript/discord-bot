@@ -31,21 +31,20 @@ export async function handleInteraction(config: Config, request: Request) {
   log("Handling interaction %s on guild %s", interaction.id, interaction.guild_id);
   // await Deno.writeTextFile("./interactions.log", JSON.stringify(interaction) + "\n", { append: true });
 
-  const storage = await getStorage(interaction.guild_id);
-  const roles = await storage.roles.getAll();
+  const storage = await getStorage();
 
   switch (interaction.type) {
     case InteractionTypes.ApplicationCommand: {
       const command = getCommand(interaction.data?.name);
 
-      return command.run({ interaction, storage, api, roles });
+      return command.run({ interaction, storage, api });
     }
 
     case InteractionTypes.MessageComponent:
     case InteractionTypes.ModalSubmit: {
       const handler = getHandler(interaction.data?.custom_id!);
 
-      return handler.handle({ interaction, storage, api, roles });
+      return handler.handle({ interaction, storage, api });
     }
 
     default:

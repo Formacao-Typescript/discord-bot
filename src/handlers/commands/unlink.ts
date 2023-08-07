@@ -15,7 +15,8 @@ export const unlink: Command = {
       required: true,
     },
   ],
-  run: async ({ interaction, roles, api, storage }) => {
+  run: async ({ interaction, api, storage }) => {
+    const roles = await storage.roles.all();
     const userId = interaction.data?.options?.find(({ name }) => name === "user")?.value;
 
     if (typeof userId !== "string") {

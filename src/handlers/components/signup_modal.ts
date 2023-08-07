@@ -4,7 +4,8 @@ import { ComponentHandler } from "./mod.ts";
 
 export const emailModal: ComponentHandler = {
   id: "emailModal",
-  handle: async ({ interaction, storage, api, roles }) => {
+  handle: async ({ interaction, storage, api }) => {
+    const roles = await storage.roles.all();
     const email = interaction.data?.components?.at(0)?.components
       // deno-lint-ignore no-explicit-any
       ?.find((component: any) => component.custom_id === "emailInput")

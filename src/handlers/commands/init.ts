@@ -17,12 +17,14 @@ export const init: Command = {
       channelTypes: [ChannelTypes.GuildText],
     },
   ],
-  run: async ({ interaction, roles, api }) => {
+  run: async ({ interaction, api, storage }) => {
     const channelId = interaction.data?.options?.find(({ name }) => name === "channel")?.value;
 
     if (typeof channelId !== "string") {
       return reply("Erro ao enviar mensagem. O canal selecionado não foi encontrado.", { ephemeral: true });
     }
+
+    const roles = await storage.roles.all();
 
     if (!roles.length) {
       return reply(

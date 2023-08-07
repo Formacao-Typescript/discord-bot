@@ -10,6 +10,7 @@ export function getRolesRepository(client: MongoClient) {
   const roles = db.collection<Role>("roles");
 
   return {
+    all: () => roles.find(),
     getForOffer: (offer: string) => roles.find({ $or: [{ offer }, { offer: { $exists: false } }] }),
     add: (params: Role) => roles.insertOne(params),
   };
