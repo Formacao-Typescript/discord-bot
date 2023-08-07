@@ -59,7 +59,7 @@ export const emailModal: ComponentHandler = {
       userRoles,
     );
 
-    return reply(`Pronto! O email ${email} foi associado ao seu usuário do discord! Sua oferta é: ${student.tier}`, {
+    return reply(`Pronto! O email ${email} foi associado ao seu usuário do discord!`, {
       flags: EPHEMERAL_MESSAGE_FLAG,
     });
   },
