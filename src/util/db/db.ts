@@ -1,5 +1,6 @@
 import { MongoClient } from "deps.ts";
 import { getConfig } from "../config.ts";
+import { ConfirmationRepository, getConfirmationRepository } from "./confirmation.ts";
 import { EventsRepository, getEventsRepository } from "./events.ts";
 import { getRolesRepository, RolesRepository } from "./roles.ts";
 import { getStudentRepository, StudentRepository } from "./students.ts";
@@ -10,6 +11,7 @@ export type Storage = {
   students: StudentRepository;
   roles: RolesRepository;
   events: EventsRepository;
+  confirmation: ConfirmationRepository;
 };
 
 const client = new MongoClient({
@@ -28,6 +30,7 @@ export const getStorage = (): Storage => {
       students: getStudentRepository(client),
       roles: getRolesRepository(client),
       events: getEventsRepository(client),
+      confirmation: getConfirmationRepository(client),
     };
   }
 

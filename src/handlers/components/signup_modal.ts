@@ -1,5 +1,7 @@
 import { ButtonComponent } from "../../util/components/button.ts";
-import { EPHEMERAL_MESSAGE_FLAG, reply } from "../../util/response.ts";
+import { InputTextComponent } from "../../util/components/text-input.ts";
+import { Modal } from "../../util/modal.ts";
+import { EPHEMERAL_MESSAGE_FLAG, reply, sendModal } from "../../util/response.ts";
 import { ComponentHandler } from "./mod.ts";
 
 export const emailModal: ComponentHandler = {
@@ -26,7 +28,7 @@ export const emailModal: ComponentHandler = {
             {
               type: 1,
               components: [
-                new ButtonComponent("retry").label("Tentar novamente").build(),
+                new ButtonComponent("ok").label("OK").build(),
               ],
             },
           ],
@@ -46,21 +48,22 @@ export const emailModal: ComponentHandler = {
       );
     }
 
-    await storage.students.completeRegister(email, `${interaction.member!.user!.id}`);
-
-    const student = await storage.students.findByDiscordId(`${interaction.member!.user!.id}`);
-
-    const userRoles = await storage.roles.getForOffer(student.tier).then((r) => r.map((r) => r.role));
-
-    if (!userRoles.length) throw new Error(`no roleId for guild ${interaction.guild_id}. ${roles}`);
-
-    await api.addUserRoles(
+    const _code = await storage.confirmation.create(
       `${interaction.member!.user!.id}`,
-      userRoles,
+      email,
+      preRegisteredUser.tier,
     );
 
-    return reply(`Pronto! O email ${email} foi associado ao seu usuário do discord!`, {
-      flags: EPHEMERAL_MESSAGE_FLAG,
-    });
+    // TODO: Send email with code
+
+    return sendModal(
+      new Modal("confirmationModal", "Confirmação de email").textInput(
+        new InputTextComponent("confirmationCode", "Código de confirmação")
+          .required()
+          .placeholder("Código recebido por email")
+          .max(6)
+          .min(6),
+      ),
+    );
   },
 };
