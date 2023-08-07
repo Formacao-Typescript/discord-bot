@@ -24,6 +24,8 @@ export async function handleWebhookRequest(_config: Config, request: Request) {
   if (!event) return httpError("bad_request", "cannot parse request body", 400);
   if (!event.data.buyer.email) return httpError("unprocessable_entity", "missing email field", 422);
 
+  await storage.events.add(event);
+
   switch (event.event) {
     case EventType.PurchaseComplete:
       await storage.students.preRegister(event.data.buyer.email, event.data.purchase.offer.code);
@@ -42,8 +44,6 @@ export async function handleWebhookRequest(_config: Config, request: Request) {
 
       break;
     }
-    default:
-      storage.events.add(event);
   }
 
   return new Response(null, { status: 202 });
