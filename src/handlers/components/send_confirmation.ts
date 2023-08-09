@@ -1,7 +1,10 @@
 import { ButtonComponent } from "../../util/components/button.ts";
+import { nsDebug } from "../../util/debug.ts";
 import { sendConfirmationEmail } from "../../util/mail.ts";
 import { EPHEMERAL_MESSAGE_FLAG, reply } from "../../util/response.ts";
 import { ComponentHandler } from "./mod.ts";
+
+const log = nsDebug("components:sendConfirmation");
 
 export const sendConfirmation: ComponentHandler = {
   id: "sendConfirmation",
@@ -54,7 +57,7 @@ export const sendConfirmation: ComponentHandler = {
 
     const emailResponse = await sendConfirmationEmail(email, code.toUpperCase());
 
-    console.log(await emailResponse.json());
+    log(await emailResponse.json());
 
     return reply("Enviamos um email com um código de confirmação. Por favor, verifique sua caixa de entrada.", {
       flags: EPHEMERAL_MESSAGE_FLAG,
