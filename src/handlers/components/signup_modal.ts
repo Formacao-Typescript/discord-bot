@@ -1,13 +1,11 @@
 import { ButtonComponent } from "../../util/components/button.ts";
-import { InputTextComponent } from "../../util/components/text-input.ts";
-import { Modal } from "../../util/modal.ts";
-import { EPHEMERAL_MESSAGE_FLAG, reply, sendModal } from "../../util/response.ts";
+import { sendConfirmationEmail } from "../../util/mail.ts";
+import { EPHEMERAL_MESSAGE_FLAG, reply } from "../../util/response.ts";
 import { ComponentHandler } from "./mod.ts";
 
 export const emailModal: ComponentHandler = {
   id: "emailModal",
-  handle: async ({ interaction, storage, api }) => {
-    const roles = await storage.roles.all();
+  handle: async ({ interaction, storage }) => {
     const email = interaction.data?.components?.at(0)?.components
       // deno-lint-ignore no-explicit-any
       ?.find((component: any) => component.custom_id === "emailInput")
@@ -48,22 +46,24 @@ export const emailModal: ComponentHandler = {
       );
     }
 
-    const _code = await storage.confirmation.create(
+    const code = await storage.confirmation.create(
       `${interaction.member!.user!.id}`,
       email,
       preRegisteredUser.tier,
     );
 
-    // TODO: Send email with code
+    await sendConfirmationEmail(email, code.toUpperCase());
 
-    return sendModal(
-      new Modal("confirmationModal", "Confirmação de email").textInput(
-        new InputTextComponent("confirmationCode", "Código de confirmação")
-          .required()
-          .placeholder("Código recebido por email")
-          .max(6)
-          .min(6),
-      ),
-    );
+    return reply("Enviamos um email com um código de confirmação. Por favor, verifique sua caixa de entrada.", {
+      flags: EPHEMERAL_MESSAGE_FLAG,
+      components: [
+        {
+          type: 1,
+          components: [
+            new ButtonComponent("confirmCodeButton").label("Recebi o código").build(),
+          ],
+        },
+      ],
+    });
   },
 };

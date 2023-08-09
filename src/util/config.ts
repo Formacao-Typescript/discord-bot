@@ -14,6 +14,10 @@ export const getConfig = async () => {
     atlasApiKey: Deno.env.get("ATLAS_API_KEY")!,
     atlasEndpoint: Deno.env.get("ATLAS_ENDPOINT")!,
     guildId: Deno.env.get("GUILD_ID")!,
+    mailgunApiKey: Deno.env.get("MAILGUN_API_KEY")!,
+    mailgunDomain: Deno.env.get("MAILGUN_DOMAIN")!,
+    mailgunFrom: Deno.env.get("MAILGUN_FROM")!,
+    mailgunRegion: Deno.env.get("MAILGUN_REGION")! as "eu" | "us",
   };
 };
 
