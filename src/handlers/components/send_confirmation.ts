@@ -3,8 +3,8 @@ import { sendConfirmationEmail } from "../../util/mail.ts";
 import { EPHEMERAL_MESSAGE_FLAG, reply } from "../../util/response.ts";
 import { ComponentHandler } from "./mod.ts";
 
-export const emailModal: ComponentHandler = {
-  id: "emailModal",
+export const sendConfirmation: ComponentHandler = {
+  id: "sendConfirmation",
   handle: async ({ interaction, storage }) => {
     const email = interaction.data?.components?.at(0)?.components
       // deno-lint-ignore no-explicit-any
@@ -52,7 +52,9 @@ export const emailModal: ComponentHandler = {
       preRegisteredUser.tier,
     );
 
-    await sendConfirmationEmail(email, code.toUpperCase());
+    const emailResponse = await sendConfirmationEmail(email, code.toUpperCase());
+
+    console.log(await emailResponse.json());
 
     return reply("Enviamos um email com um código de confirmação. Por favor, verifique sua caixa de entrada.", {
       flags: EPHEMERAL_MESSAGE_FLAG,
@@ -60,7 +62,7 @@ export const emailModal: ComponentHandler = {
         {
           type: 1,
           components: [
-            new ButtonComponent("confirmCodeButton").label("Recebi o código").build(),
+            new ButtonComponent("showConfirmationModal").label("Recebi o código").build(),
           ],
         },
       ],

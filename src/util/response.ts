@@ -4,7 +4,6 @@ import { Modal } from "./modal.ts";
 export const EPHEMERAL_MESSAGE_FLAG = 64;
 
 const interactionResponse = (response: InteractionResponse) => {
-  // console.log(JSON.stringify(response));
   return json(response);
 };
 

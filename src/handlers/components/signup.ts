@@ -4,7 +4,7 @@ import { EPHEMERAL_MESSAGE_FLAG, reply, sendModal } from "../../util/response.ts
 import { Context } from "../types.ts";
 import { ComponentHandler } from "./mod.ts";
 
-export const signupButton: ComponentHandler = {
+export const signup: ComponentHandler = {
   id: "signup",
   async handle({ storage, interaction }: Context) {
     const userExists = await storage.students.existsByDiscordId(`${interaction.member!.user!.id}`);
@@ -17,7 +17,7 @@ export const signupButton: ComponentHandler = {
     }
 
     return sendModal(
-      new Modal("emailModal", "Verificação de Acesso")
+      new Modal("sendConfirmation", "Verificação de Acesso")
         .textInput(
           new InputTextComponent("emailInput", "Digite o email de compra no site 👇")
             .required()

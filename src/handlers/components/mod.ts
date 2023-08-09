@@ -1,9 +1,9 @@
 import { Context } from "../types.ts";
-import { confirmCodeButton } from "./confirm_code_button.ts";
-import { confirmationModal } from "./confirmation_modal.ts";
-import { signupButton } from "./signup_button.ts";
-import { emailModal } from "./signup_modal.ts";
-import { unlinkButton } from "./unlink_button.ts";
+import { confirmEmail } from "./confirm_email.ts";
+import { sendConfirmation } from "./send_confirmation.ts";
+import { showConfirmationModal } from "./show_confirmation_modal.ts";
+import { signup } from "./signup.ts";
+import { unlink } from "./unlink.ts";
 
 export type ComponentHandler = {
   id: string;
@@ -11,11 +11,11 @@ export type ComponentHandler = {
 };
 
 export const HANDLERS = [
-  signupButton,
-  emailModal,
-  unlinkButton,
-  confirmCodeButton,
-  confirmationModal,
+  signup,
+  sendConfirmation,
+  showConfirmationModal,
+  confirmEmail,
+  unlink,
 ];
 
 export const getHandler = (id: string) => {

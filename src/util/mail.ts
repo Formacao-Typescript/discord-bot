@@ -15,8 +15,8 @@ export function sendConfirmationEmail(email: string, code: string) {
     from: config.mailgunFrom,
     subject: "Formação Typescript: Discord",
     template: "discord_confirmation",
-    "t:variables": {
+    "h:X-Mailgun-Variables": JSON.stringify({
       confirmationCode: code,
-    },
+    }),
   });
 }

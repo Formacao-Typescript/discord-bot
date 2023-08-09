@@ -11,11 +11,12 @@ export type Confirmation = {
   consumed: boolean;
 };
 
-const getRandomCode = () => Array.from(crypto.getRandomValues(new Uint8Array(4))).map((n) => n.toString(16)).join("");
+const getRandomCode = () =>
+  Array.from(crypto.getRandomValues(new Uint8Array(8))).map((n) => n.toString(16)).join("").slice(0, 8);
 
 export function getConfirmationRepository(client: MongoClient) {
   const db = client.database("discord");
-  const confirmations = db.collection<Confirmation>("roles");
+  const confirmations = db.collection<Confirmation>("confirmation");
 
   return {
     create: async (discordId: string, email: string, tier: string) => {
@@ -29,7 +30,7 @@ export function getConfirmationRepository(client: MongoClient) {
       return code;
     },
     getByDiscordId: (discordId: string) => {
-      return confirmations.findOne({ discordId, expiresAt: { $lt: new Date() } });
+      return confirmations.findOne({ discordId, expiresAt: { $gt: new Date() } });
     },
     consume: (discordId: string) => confirmations.updateOne({ discordId }, { $set: { consumed: true } }),
   };
