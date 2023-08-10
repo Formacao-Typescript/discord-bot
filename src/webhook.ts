@@ -38,7 +38,7 @@ export async function handleWebhookRequest(_config: Config, request: Request) {
       const inviteLink = `https://discord.gg/${inviteLinkId}`;
       const sendEmailResponse = await sendWelcomeEmail(event.data.buyer.email, inviteLink);
       log(
-        `Sent welcome email to ${event.data.buyer.email}. Response: ${sendEmailResponse}`,
+        `Sent welcome email to ${event.data.buyer.email}. Response: ${JSON.stringify(await sendEmailResponse.json())}`,
       );
       break;
     }

@@ -85,8 +85,8 @@ export function createApi(config: Config) {
       max_uses: 1,
       unique: true,
     });
-    const { code } = await response.json();
-    return code;
+
+    return response.code;
   };
 
   return {
