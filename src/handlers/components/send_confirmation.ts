@@ -25,14 +25,6 @@ export const sendConfirmation: ComponentHandler = {
         `Opa. Não consegui achar o email ${email} no meu banco de dados. Tem certeza que foi com esse email que você comprou o curso?`,
         {
           flags: EPHEMERAL_MESSAGE_FLAG,
-          components: [
-            {
-              type: 1,
-              components: [
-                new ButtonComponent("ok").label("OK").build(),
-              ],
-            },
-          ],
         },
       );
     }
