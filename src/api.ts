@@ -21,9 +21,14 @@ const getCustomFetch = (token: string) => async (endpoint: string, payload: unkn
     body,
   });
 
-  log(`Response status: %s. body: %s`, response.status, await response.text());
+  const originalBody = await response.text();
+  log(`Response status: %s. body: %s`, response.status, originalBody);
 
-  return response;
+  try {
+    return JSON.parse(originalBody);
+  } catch {
+    return originalBody;
+  }
 };
 
 export function createApi(config: Config) {
