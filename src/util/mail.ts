@@ -20,3 +20,15 @@ export function sendConfirmationEmail(email: string, code: string) {
     }),
   });
 }
+
+export function sendWelcomeEmail(email: string, inviteLink: string) {
+  return mailgun.send({
+    to: email,
+    from: config.mailgunFrom,
+    subject: "Boas vindas à Formação Typescript",
+    template: "welcome",
+    "h:X-Mailgun-Variables": JSON.stringify({
+      inviteLink,
+    }),
+  });
+}

@@ -73,12 +73,24 @@ export function createApi(config: Config) {
     }
   };
 
+  const createChannelInvite = async (channelId: string, duration = 604800) => {
+    log(`Creating invite for channel ${channelId} with duration ${duration}`);
+    const response = await sendRequest(`/channels/${channelId}/invites`, {
+      max_age: duration,
+      max_uses: 1,
+      unique: true,
+    });
+    const { code } = await response.json();
+    return code;
+  };
+
   return {
     sendMessage,
     deleteMessage,
     sendFollowupMessage,
     addUserRoles,
     removeUserRoles,
+    createChannelInvite,
   };
 }
 

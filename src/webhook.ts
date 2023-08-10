@@ -3,6 +3,10 @@ import { createApi } from "./api.ts";
 import { Config, getConfig } from "./util/config.ts";
 import { getStorage } from "./util/db/db.ts";
 import { Event, EventType } from "./util/db/events.ts";
+import { nsDebug } from "./util/debug.ts";
+import { sendWelcomeEmail } from "./util/mail.ts";
+
+const log = nsDebug("webhook");
 
 const config = await getConfig();
 const httpError = (code: string, message: string, status: number) =>
@@ -27,9 +31,17 @@ export async function handleWebhookRequest(_config: Config, request: Request) {
   await storage.events.add(event);
 
   switch (event.event) {
-    case EventType.PurchaseApproved:
+    case EventType.PurchaseApproved: {
       await storage.students.preRegister(event.data.buyer.email, event.data.purchase.offer.code);
+      log(`Pre-registered ${event.data.buyer.email} for ${event.data.purchase.offer.code}`);
+      const inviteLinkId = await api.createChannelInvite(config.channelId);
+      const inviteLink = `https://discord.gg/${inviteLinkId}`;
+      const sendEmailResponse = await sendWelcomeEmail(event.data.buyer.email, inviteLink);
+      log(
+        `Sent welcome email to ${event.data.buyer.email}. Respose: ${JSON.stringify(await sendEmailResponse.json())}`,
+      );
       break;
+    }
     case EventType.PurchaseProtest:
     case EventType.PurchaseCanceled: {
       const student = await storage.students.findByEmail(event.data.buyer.email);
