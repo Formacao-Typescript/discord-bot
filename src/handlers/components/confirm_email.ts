@@ -29,7 +29,7 @@ export const confirmEmail: ComponentHandler = {
     const roles = await storage.roles.all();
 
     const [, , student] = await Promise.all([
-      storage.confirmation.consume(userId),
+      storage.confirmation.consume(confirmationCode),
       storage.students.completeRegister(email, userId),
       storage.students.findPreRegistered(email),
     ]);

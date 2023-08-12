@@ -23,16 +23,15 @@ export function getConfirmationRepository(client: MongoClient) {
       const code = getRandomCode();
       const expiresAt = new Date(Date.now() + TEN_MINUTES_IN_MS);
 
-      await confirmations.updateOne({ discordId }, { $set: { code, expiresAt, email, tier, consumed: false } }, {
-        upsert: true,
-      });
+      await confirmations.updateMany({ discordId }, { $set: { consumed: true } });
+      await confirmations.insertOne({ discordId, code, expiresAt, email, tier, consumed: false });
 
       return code;
     },
     getByDiscordId: (discordId: string) => {
-      return confirmations.findOne({ discordId, expiresAt: { $gt: new Date() } });
+      return confirmations.findOne({ discordId, expiresAt: { $gt: new Date() }, consumed: false });
     },
-    consume: (discordId: string) => confirmations.updateOne({ discordId }, { $set: { consumed: true } }),
+    consume: (code: string) => confirmations.updateOne({ code }, { $set: { consumed: true } }),
   };
 }
 

@@ -58,6 +58,7 @@ export const sendConfirmation: ComponentHandler = {
           type: 1,
           components: [
             new ButtonComponent("showConfirmationModal").label("Recebi o código").build(),
+            new ButtonComponent("signup").label("Tentar novamente").build(),
           ],
         },
       ],
