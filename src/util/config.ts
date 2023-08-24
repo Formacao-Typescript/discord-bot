@@ -1,5 +1,7 @@
 import { load } from "deps.ts";
 
+type Offer = { offer: string; name: string; slug: string };
+
 export const getConfig = async () => {
   await load({
     export: true,
@@ -19,6 +21,9 @@ export const getConfig = async () => {
     mailgunDomain: Deno.env.get("MAILGUN_DOMAIN")!,
     mailgunFrom: Deno.env.get("MAILGUN_FROM")!,
     mailgunRegion: Deno.env.get("MAILGUN_REGION")! as "eu" | "us",
+    ghostToken: Deno.env.get("GHOST_TOKEN")!,
+    ghostNewsletterId: Deno.env.get("GHOST_NEWSLETTER_ID")!,
+    offerLabels: JSON.parse(Deno.env.get("OFFER_LABELS")!) as Offer[],
   };
 };
 

@@ -4,6 +4,7 @@ import { Config, getConfig } from "./util/config.ts";
 import { getStorage } from "./util/db/db.ts";
 import { Event, EventType } from "./util/db/events.ts";
 import { nsDebug } from "./util/debug.ts";
+import * as ghost from "./util/ghost.ts";
 import { sendWelcomeEmail } from "./util/mail.ts";
 
 const log = nsDebug("webhook");
@@ -21,7 +22,7 @@ const httpError = (code: string, message: string, status: number) =>
   });
 
 export async function handleWebhookRequest(_config: Config, request: Request) {
-  const storage = await getStorage();
+  const storage = getStorage();
   const api = createApi(config);
   const event: Event | undefined = await request.json().catch(() => undefined);
 
@@ -40,19 +41,28 @@ export async function handleWebhookRequest(_config: Config, request: Request) {
       log(
         `Sent welcome email to ${event.data.buyer.email}. Response: ${JSON.stringify(await sendEmailResponse.json())}`,
       );
+
+      await ghost.addMember(event.data.buyer.email, event.data.purchase.offer.code);
+      log(`Added ${event.data.buyer.email} to Ghost.`);
+
       break;
     }
     case EventType.PurchaseProtest:
     case EventType.PurchaseCanceled: {
       const student = await storage.students.findByEmail(event.data.buyer.email);
-      if (!student || !student.discordId) break;
+      if (!student?.discordId) break;
 
       await storage.students.unlinkByDiscordId(student.discordId);
+      log(`Unlinked ${student.discordId} from ${event.data.buyer.email}.`);
 
       await api.removeUserRoles(
         student.discordId,
         await storage.roles.getForOffer(student.tier).then((r) => r.map((r) => r.role)),
       );
+      log(`Removed roles from ${student.discordId}.`);
+
+      await ghost.removeMember(event.data.buyer.email, event.data.purchase.offer.code);
+      log(`Update labels for ${event.data.buyer.email} on Ghost.`);
 
       break;
     }
