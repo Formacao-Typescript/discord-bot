@@ -5,17 +5,20 @@ const BASE_URL = "https://blog.lsantos.dev/ghost/api/admin/";
 const config = await getConfig();
 
 const getLabelsForOffer = (offer: string, direction: "join" | "leave") => {
+  const BASE_LABELS = [
+    { name: "Hotmart", "slug": "hotmart" },
+  ];
+
+  if (direction === "leave") return [...BASE_LABELS, { slug: "reembolso-formacao-ts", name: "Reembolso Formação TS" }];
+
   const label = config.offerLabels.filter((o) => o.offer === offer)[0];
 
   return [
     ...(label ? [label] : []),
     { name: `Oferta ${offer}`, "slug": `oferta-${offer}` },
-    ...(
-      direction === "join"
-        ? [{ name: "Aluno Formação TS", "slug": "aluno-formacaots" }, { name: "Aluno", "slug": "aluno" }]
-        : [{ slug: "reembolso-formacao-ts", name: "Reembolso Formação TS" }]
-    ),
-    { name: "Hotmart", "slug": "hotmart" },
+    { name: "Aluno Formação TS", "slug": "aluno-formacaots" },
+    { name: "Aluno", "slug": "aluno" },
+    ...BASE_LABELS,
   ];
 };
 
