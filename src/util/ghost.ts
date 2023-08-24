@@ -80,15 +80,25 @@ export const sendRequest = async (method: string, path: string, data?: unknown) 
   });
 };
 
-export const addMember = (email: string, offer: string) => {
+export const addMember = async (email: string, offer: string) => {
+  const existingMember = await getMemberByEmail(email);
+
+  if (existingMember) return;
+
   return sendRequest("POST", "members", {
     members: [{ email, newsletters: [{ id: config.ghostNewsletterId }], labels: getLabelsForOffer(offer, "join") }],
   });
 };
 
+export const getMemberByEmail = (email: string) => {
+  return sendRequest("GET", `members?filter=email:${email}&limit=1`)
+    .then(({ members: [member] = [] } = {}) => member)
+    .then((member) => member ?? null)
+    .catch(() => null);
+};
+
 export const removeMember = async (email: string, offer: string) => {
-  const member = await sendRequest("GET", `members?filter=email:${email}&limit=1`)
-    .then(({ members: [member] = [] } = {}) => member);
+  const member = await getMemberByEmail(email);
 
   if (!member) throw new Error(`Member not found with email ${email}`);
 
