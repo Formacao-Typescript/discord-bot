@@ -50,18 +50,19 @@ export async function handleWebhookRequest(_config: Config, request: Request) {
     case EventType.PurchaseProtest:
     case EventType.PurchaseCanceled: {
       const student = await storage.students.findByEmail(event.data.buyer.email);
-      if (!student?.discordId) break;
 
-      await storage.students.unlinkByDiscordId(student.discordId);
-      log(`Unlinked ${student.discordId} from ${event.data.buyer.email}.`);
+      if (student.discordId) {
+        await storage.students.unlinkByDiscordId(student.discordId);
+        log(`Unlinked ${student.discordId} from ${event.data.buyer.email}.`);
 
-      await api.removeUserRoles(
-        student.discordId,
-        await storage.roles.getForOffer(student.tier).then((r) => r.map((r) => r.role)),
-      );
-      log(`Removed roles from ${student.discordId}.`);
+        await api.removeUserRoles(
+          student.discordId,
+          await storage.roles.getForOffer(student.tier).then((r) => r.map((r) => r.role)),
+        );
+        log(`Removed roles from ${student.discordId}.`);
+      }
 
-      await ghost.removeMember(event.data.buyer.email, event.data.purchase.offer.code);
+      await ghost.removeMember(event.data.buyer.email);
       log(`Update labels for ${event.data.buyer.email} on Ghost.`);
 
       break;
