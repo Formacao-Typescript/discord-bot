@@ -4,21 +4,15 @@ import { getConfig } from "./config.ts";
 const BASE_URL = "https://blog.lsantos.dev/ghost/api/admin/";
 const config = await getConfig();
 
-const getLabelsForOffer = (offer: string, direction: "join" | "leave") => {
-  const BASE_LABELS = [
-    { name: "Hotmart", "slug": "hotmart" },
-  ];
-
-  if (direction === "leave") return [...BASE_LABELS, { slug: "reembolso-formacao-ts", name: "Reembolso Formação TS" }];
-
-  const label = config.offerLabels.filter((o) => o.offer === offer)[0];
+const getLabelsForOffer = (offer: string, preExisting = false) => {
+  const offerLabel = config.offerLabels.filter((o) => o.offer === offer);
 
   return [
-    ...(label ? [label] : []),
-    { name: `Oferta ${offer}`, "slug": `oferta-${offer}` },
-    { name: "Aluno Formação TS", "slug": "aluno-formacaots" },
-    { name: "Aluno", "slug": "aluno" },
-    ...BASE_LABELS,
+    ...(offerLabel ? [offerLabel] : []),
+    { name: `Oferta ${offer}`, slug: `oferta-${offer}` },
+    { name: "Aluno Formação TS", slug: "aluno-formacaots" },
+    { name: "Aluno", slug: "aluno" },
+    ...(preExisting ? [] : [{ name: "Hotmart", slug: "hotmart" }]),
   ];
 };
 
@@ -80,13 +74,28 @@ export const sendRequest = async (method: string, path: string, data?: unknown) 
   });
 };
 
-export const addMember = async (email: string, offer: string) => {
-  const existingMember = await getMemberByEmail(email);
+// deno-lint-ignore no-explicit-any
+export const addMemberLabels = (member: any, offer: string) => {
+  const newLabels = getLabelsForOffer(offer);
 
-  if (existingMember) return;
+  const labels = [...member.labels, ...newLabels];
+
+  return sendRequest("PUT", `members/${member.id}`, {
+    members: [{ labels }],
+  });
+};
+
+export const addMember = async (email: string, offer: string) => {
+  const member = await getMemberByEmail(email);
+
+  if (member) return addMemberLabels(member, offer);
 
   return sendRequest("POST", "members", {
-    members: [{ email, newsletters: [{ id: config.ghostNewsletterId }], labels: getLabelsForOffer(offer, "join") }],
+    members: [{
+      email,
+      newsletters: [{ id: config.ghostNewsletterId }],
+      labels: getLabelsForOffer(offer),
+    }],
   });
 };
 
@@ -97,12 +106,20 @@ export const getMemberByEmail = (email: string) => {
     .catch(() => null);
 };
 
-export const removeMember = async (email: string, offer: string) => {
+export const removeMember = async (email: string) => {
   const member = await getMemberByEmail(email);
 
-  if (!member) throw new Error(`Member not found with email ${email}`);
+  if (!member) {
+    console.log(`member not found with email ${email}`);
+    return;
+  }
+
+  const currentLabels = member.labels as Array<{ name: string; slug: string }>;
+  const newLabels = currentLabels
+    .filter((label) => !label.slug.startsWith("oferta") && !label.slug.startsWith("aluno"))
+    .concat([{ slug: "reembolso-formacao-ts", name: "Reembolso Formação TS" }]);
 
   return sendRequest("PUT", `members/${member.id}`, {
-    members: [{ labels: getLabelsForOffer(offer, "leave") }],
+    members: [{ labels: newLabels }],
   });
 };
