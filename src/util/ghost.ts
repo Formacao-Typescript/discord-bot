@@ -8,7 +8,9 @@ const config = await getConfig();
 const log = nsDebug("ghost");
 
 const getLabelsForOffer = (offer: string, preExisting = false) => {
-  const offerLabel = config.offerLabels.filter((o) => o.offer === offer);
+  const offerLabel = config.offerLabels
+    .filter((o) => o.offer === offer)
+    .map(({ name, slug }) => ({ name, slug }));
 
   return [
     ...(offerLabel ? [offerLabel] : []),
@@ -88,7 +90,7 @@ export const addMemberLabels = (member: any, offer: string) => {
   const labels = [...member.labels, ...newLabels];
 
   return sendRequest("PUT", `members/${member.id}`, {
-    members: [{ labels }],
+    members: [{ ...member, labels }],
   });
 };
 

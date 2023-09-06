@@ -6,6 +6,7 @@ export type Student = {
   tier: string;
   createdAt: Date;
   linkedAt: Date | null;
+  welcomeEmailSent: boolean;
 };
 
 export function getStudentRepository(client: MongoClient) {
@@ -14,7 +15,7 @@ export function getStudentRepository(client: MongoClient) {
 
   return {
     findByEmail: (email: string) => {
-      return students.findOne({ email });
+      return students.findOne({ email }).catch(() => null);
     },
     findByDiscordId: (discordId: string) => students.findOne({ discordId }),
     completeRegister: (email: string, discordId: string) => {
@@ -24,11 +25,19 @@ export function getStudentRepository(client: MongoClient) {
       students.countDocuments({ email, discordId: { $exists: true, $ne: "" } }).then((count) => count > 0),
     existsByDiscordId: (discordId: string) => students.countDocuments({ discordId }).then((count) => count > 0),
     preRegister: (email: string, tier = "free") =>
-      students.updateOne({ email }, { email, discordId: "", tier, createdAt: new Date() }, { upsert: true }),
+      students.updateOne({ email }, {
+        email,
+        discordId: "",
+        tier,
+        createdAt: new Date(),
+      }, {
+        upsert: true,
+      }),
     findPreRegistered: (email: string) => students.findOne({ email, discordId: "" }),
     removeByEmail: (email: string) => students.deleteOne({ email }),
     unlinkByDiscordId: (discordId: string) =>
       students.updateOne({ discordId }, { $set: { discordId: "", linkedAt: null } }),
+    completeWelcomeEmail: (email: string) => students.updateOne({ email }, { $set: { welcomeEmailSent: true } }),
   };
 }
 

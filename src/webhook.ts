@@ -34,16 +34,24 @@ export async function handleWebhookRequest(_config: Config, request: Request) {
 
     switch (event.event) {
       case EventType.PurchaseApproved: {
-        await storage.students.preRegister(event.data.buyer.email, event.data.purchase.offer.code);
-        log(`Pre-registered ${event.data.buyer.email} for ${event.data.purchase.offer.code}`);
-        const inviteLinkId = await api.createChannelInvite(config.channelId);
-        const inviteLink = `https://discord.gg/${inviteLinkId}`;
-        const sendEmailResponse = await sendWelcomeEmail(event.data.buyer.email, inviteLink);
-        log(
-          `Sent welcome email to ${event.data.buyer.email}. Response: ${
-            JSON.stringify(await sendEmailResponse.json())
-          }`,
-        );
+        const student = await storage.students.findByEmail(event.data.buyer.email);
+
+        if (!student?.discordId) {
+          await storage.students.preRegister(event.data.buyer.email, event.data.purchase.offer.code);
+          log(`Pre-registered ${event.data.buyer.email} for ${event.data.purchase.offer.code}`);
+        }
+
+        if (!student?.welcomeEmailSent) {
+          const inviteLinkId = await api.createChannelInvite(config.channelId);
+          const inviteLink = `https://discord.gg/${inviteLinkId}`;
+          await storage.students.completeWelcomeEmail(event.data.buyer.email);
+          const sendEmailResponse = await sendWelcomeEmail(event.data.buyer.email, inviteLink);
+          log(
+            `Sent welcome email to ${event.data.buyer.email}. Response: ${
+              JSON.stringify(await sendEmailResponse.json())
+            }`,
+          );
+        }
 
         await ghost.addMember(event.data.buyer.email, event.data.purchase.offer.code);
         log(`Added ${event.data.buyer.email} to Ghost.`);
@@ -54,7 +62,7 @@ export async function handleWebhookRequest(_config: Config, request: Request) {
       case EventType.PurchaseCanceled: {
         const student = await storage.students.findByEmail(event.data.buyer.email);
 
-        if (student.discordId) {
+        if (student?.discordId) {
           await storage.students.unlinkByDiscordId(student.discordId);
           log(`Unlinked ${student.discordId} from ${event.data.buyer.email}.`);
 
