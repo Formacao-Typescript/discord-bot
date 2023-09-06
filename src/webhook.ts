@@ -80,7 +80,11 @@ export async function handleWebhookRequest(_config: Config, request: Request) {
       }
     }
   } catch (error) {
-    api.sendMessage(config.devChannelId, `Error processing \`${event.event}\` event: ${error}`, { ephemeral: false })
+    api.sendMessage(
+      config.devChannelId,
+      `Error processing \`${event.event}\` event: \`\`\`${error}\`\`\``,
+      { ephemeral: false },
+    )
       .catch(console.error);
   }
 
