@@ -36,7 +36,7 @@ export async function handleWebhookRequest(_config: Config, request: Request) {
       case EventType.PurchaseApproved: {
         const student = await storage.students.findByEmail(event.data.buyer.email);
 
-        if (!student?.discordId) {
+        if (!student) {
           await storage.students.preRegister(event.data.buyer.email, event.data.purchase.offer.code);
           log(`Pre-registered ${event.data.buyer.email} for ${event.data.purchase.offer.code}`);
         }
