@@ -13,7 +13,7 @@ const getLabelsForOffer = (offer: string, preExisting = false) => {
     .map(({ name, slug }) => ({ name, slug }));
 
   return [
-    ...(offerLabel ? [offerLabel] : []),
+    ...(offerLabel ? offerLabel : []),
     { name: `Oferta ${offer}`, slug: `oferta-${offer}` },
     { name: "Aluno Formação TS", slug: "aluno-formacaots" },
     { name: "Aluno", slug: "aluno" },
