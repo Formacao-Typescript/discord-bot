@@ -24,6 +24,7 @@ export const getConfig = async () => {
     ghostToken: Deno.env.get("GHOST_TOKEN")!,
     ghostNewsletterId: Deno.env.get("GHOST_NEWSLETTER_ID")!,
     offerLabels: JSON.parse(Deno.env.get("OFFER_LABELS")!) as Offer[],
+    devChannelId: Deno.env.get("DEV_CHANNEL_ID")!,
   };
 };
 

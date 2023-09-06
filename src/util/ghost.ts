@@ -1,8 +1,11 @@
 import { decode } from "https://deno.land/std@0.199.0/encoding/hex.ts";
 import { create, getNumericDate } from "https://deno.land/x/djwt@v2.9.1/mod.ts";
 import { getConfig } from "./config.ts";
+import { nsDebug } from "./debug.ts";
 const BASE_URL = "https://blog.lsantos.dev/ghost/api/admin/";
 const config = await getConfig();
+
+const log = nsDebug("ghost");
 
 const getLabelsForOffer = (offer: string, preExisting = false) => {
   const offerLabel = config.offerLabels.filter((o) => o.offer === offer);
@@ -56,8 +59,11 @@ const getJwt = async () => {
 
 export const sendRequest = async (method: string, path: string, data?: unknown) => {
   const token = await getJwt();
+  const url = new URL(path, BASE_URL);
 
-  return fetch(new URL(path, BASE_URL), {
+  log(`sending ${method} to ${url} with body ${JSON.stringify(data)}`);
+
+  return fetch(url, {
     method,
     headers: {
       "Content-Type": "application/json",
@@ -66,6 +72,7 @@ export const sendRequest = async (method: string, path: string, data?: unknown) 
     },
     ...(data ? { body: JSON.stringify(data) } : {}),
   }).then(async (response) => {
+    log(`got ${response.status} response`);
     if (!response.ok) {
       throw new Error(await response.text());
     }
