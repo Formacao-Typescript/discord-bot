@@ -28,6 +28,8 @@ export async function handleWebhookRequest(_config: Config, request: Request) {
   if (!event) return httpError("bad_request", "cannot parse request body", 400);
   if (!event.data.buyer.email) return httpError("unprocessable_entity", "missing email field", 422);
 
+  await storage.events.add(event);
+
   try {
     await eventComponser.execute({ event, api, storage, config, handled: false });
   } catch (error) {

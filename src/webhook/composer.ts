@@ -19,12 +19,6 @@ type Context = {
 
 export const eventComponser = new HotmartComposer<Context>();
 
-eventComponser
-  .use(async (ctx, next) => {
-    await ctx.storage.events.add(ctx.event);
-    return next(ctx);
-  });
-
 eventComponser.on(EventType.PurchaseApproved, async (ctx, next) => {
   const student = await ctx.storage.students.findByEmail(ctx.event.data.buyer.email);
 
