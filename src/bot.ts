@@ -14,9 +14,7 @@ export async function handleInteraction(config: Config, request: Request) {
   const api = createApi(config);
   const [error, body] = await validateRequestSignature(request, config.publicKey);
 
-  if (error) {
-    return error;
-  }
+  if (error) return error;
 
   const interaction = JSON.parse(body) as Interaction & {
     guild_id: string;
@@ -29,8 +27,6 @@ export async function handleInteraction(config: Config, request: Request) {
   }
 
   log("Handling interaction %s on guild %s", interaction.id, interaction.guild_id);
-  // await Deno.writeTextFile("./interactions.log", JSON.stringify(interaction) + "\n", { append: true });
-
   const storage = await getStorage();
 
   switch (interaction.type) {
@@ -42,9 +38,10 @@ export async function handleInteraction(config: Config, request: Request) {
 
     case InteractionTypes.MessageComponent:
     case InteractionTypes.ModalSubmit: {
-      const handler = getHandler(interaction.data?.custom_id!);
+      const interactionId = interaction.data?.custom_id!;
+      const handler = getHandler(interactionId);
 
-      return handler.handle({ interaction, storage, api });
+      return handler.handle({ interaction, storage, api }, interactionId);
     }
 
     default:

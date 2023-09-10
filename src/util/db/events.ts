@@ -116,6 +116,7 @@ export function getEventsRepository(client: MongoClient) {
 
   return {
     add: (params: Event) => events.insertOne({ ...params, received_at: new Date() }),
+    findById: (id: string) => events.findOne({ id }),
   };
 }
 

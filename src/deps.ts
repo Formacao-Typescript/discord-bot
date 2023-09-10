@@ -21,3 +21,4 @@ export {
 } from "https://deno.land/x/discordeno@18.0.1/mod.ts";
 export { json, serve, serveStatic, validateRequest } from "https://deno.land/x/sift@0.6.0/mod.ts";
 export { z } from "https://deno.land/x/zod@v3.21.4/mod.ts";
+export { Composer, type Middleware } from "https://deno.land/x/composer@v1.0.5/mod.ts";
