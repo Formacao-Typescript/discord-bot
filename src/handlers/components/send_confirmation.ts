@@ -49,7 +49,7 @@ export const sendConfirmation: ComponentHandler = {
 
     const emailResponse = await sendConfirmationEmail(email, code.toUpperCase());
 
-    log(await emailResponse.json());
+    log(JSON.stringify(await emailResponse.json()));
 
     return reply("Enviamos um email com um código de confirmação. Por favor, verifique sua caixa de entrada.", {
       flags: EPHEMERAL_MESSAGE_FLAG,
