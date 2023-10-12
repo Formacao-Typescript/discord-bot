@@ -33,16 +33,16 @@ export function sendWelcomeEmail(email: string, inviteLink: string) {
   });
 }
 
-export function sendStrikeEmail(
+export function sendReminderEmail(
   email: string,
   inviteLink: string,
-  strikeNumber: "first" | "second" | "third" | "kick",
+  reminderNumber: "first" | "second" | "third",
 ) {
   return mailgun.send({
     to: email,
     from: config.mailgunFrom,
     subject: "Formação Typescript: Discord",
-    template: `${strikeNumber}_discord_strike`,
+    template: `${reminderNumber}_discord_reminder`,
     "h:X-Mailgun-Variables": JSON.stringify({
       inviteLink,
     }),

@@ -11,6 +11,8 @@ export type Student = {
   strikes: number;
   lastStrike: Date | null;
   discordInviteLink: string | null;
+  reminders: number;
+  lastReminder: Date | null;
 };
 
 function createStudent(email: string, tier: string): Student {
@@ -24,6 +26,8 @@ function createStudent(email: string, tier: string): Student {
     strikes: 0,
     discordInviteLink: null,
     welcomeEmailSent: false,
+    reminders: 0,
+    lastReminder: null,
   };
 }
 
@@ -35,6 +39,11 @@ function hydrateStudent(students: Collection<Student>) {
       students.updateOne(
         { email: student.email },
         { $inc: { strikes: 1 }, $set: { lastStrike: new Date() } },
+      ),
+    remind: () =>
+      students.updateOne(
+        { email: student.email },
+        { $inc: { reminders: 1 }, $set: { lastReminder: new Date() } },
       ),
     setInviteLink: (inviteLink: string) =>
       students.updateOne(
