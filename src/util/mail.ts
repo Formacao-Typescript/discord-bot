@@ -32,3 +32,19 @@ export function sendWelcomeEmail(email: string, inviteLink: string) {
     }),
   });
 }
+
+export function sendStrikeEmail(
+  email: string,
+  inviteLink: string,
+  strikeNumber: "first" | "second" | "third" | "kick",
+) {
+  return mailgun.send({
+    to: email,
+    from: config.mailgunFrom,
+    subject: "Formação Typescript: Discord",
+    template: `${strikeNumber}_discord_strike`,
+    "h:X-Mailgun-Variables": JSON.stringify({
+      inviteLink,
+    }),
+  });
+}

@@ -28,10 +28,11 @@ export const confirmEmail: ComponentHandler = {
     const email = confirmation.email;
     const roles = await storage.roles.all();
 
-    const [, , student] = await Promise.all([
+    const student = await storage.students.findPreRegistered(email);
+
+    await Promise.all([
       storage.confirmation.consume(confirmationCode),
-      storage.students.completeRegister(email, userId),
-      storage.students.findPreRegistered(email),
+      student.completeRegister(userId),
     ]);
 
     const userRoles = await storage.roles.getForOffer(student.tier).then((r) => r.map((r) => r.role));

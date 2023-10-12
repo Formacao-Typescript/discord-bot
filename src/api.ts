@@ -6,7 +6,7 @@ const log = nsDebug("api");
 
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
-const GUILD_ID = await getConfig().then((config) => config.guildId);
+const GUILD_ID = getConfig().guildId;
 
 const getCustomFetch = (token: string) => async (endpoint: string, payload: unknown, method: Method = "POST") => {
   const url = new URL(`${BASE_URL}${endpoint}`);
@@ -89,6 +89,11 @@ export function createApi(config: Config) {
     return response.code;
   };
 
+  const kickMember = async (userId: string, reason: string) => {
+    log(`Kicking user ${userId} with reason ${reason}`);
+    await sendRequest(`/guilds/${GUILD_ID}/members/${userId}`, {}, "DELETE");
+  };
+
   return {
     sendMessage,
     deleteMessage,
@@ -96,6 +101,7 @@ export function createApi(config: Config) {
     addUserRoles,
     removeUserRoles,
     createChannelInvite,
+    kickMember,
   };
 }
 

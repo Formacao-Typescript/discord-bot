@@ -1,9 +1,10 @@
-import { load } from "deps.ts";
+import { loadSync } from "deps.ts";
 
 type Offer = { offer: string; name: string; slug: string };
 
-export const getConfig = async () => {
-  await load({
+export const getConfig = () => {
+  loadSync({
+    envPath: ".env.prod",
     export: true,
     allowEmptyValues: false,
   });
@@ -15,6 +16,7 @@ export const getConfig = async () => {
     port: Number(Deno.env.get("PORT") ?? "") || undefined,
     atlasApiKey: Deno.env.get("ATLAS_API_KEY")!,
     atlasEndpoint: Deno.env.get("ATLAS_ENDPOINT")!,
+    defaultDiscordInvite: Deno.env.get("DEFAULT_DISCORD_INVITE")!,
     guildId: Deno.env.get("GUILD_ID")!,
     channelId: Deno.env.get("CHANNEL_ID")!,
     mailgunApiKey: Deno.env.get("MAILGUN_API_KEY")!,

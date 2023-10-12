@@ -14,7 +14,7 @@ export type Storage = {
   confirmation: ConfirmationRepository;
 };
 
-const client = new MongoClient({
+export const client = new MongoClient({
   dataSource: "Cluster0",
   auth: {
     apiKey: config.atlasApiKey,

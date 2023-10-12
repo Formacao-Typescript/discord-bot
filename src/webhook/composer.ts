@@ -3,9 +3,9 @@ import { HotmartComposer } from "../util/composer.ts";
 import { Config } from "../util/config.ts";
 import { getStorage } from "../util/db/db.ts";
 import { Event, EventType } from "../util/db/events.ts";
+import { nsDebug } from "../util/debug.ts";
 import * as ghost from "../util/ghost.ts";
 import { sendWelcomeEmail } from "../util/mail.ts";
-import { nsDebug } from "../util/debug.ts";
 
 const log = nsDebug("webhook");
 
@@ -20,23 +20,31 @@ type Context = {
 export const eventComponser = new HotmartComposer<Context>();
 
 eventComponser.on(EventType.PurchaseApproved, async (ctx, next) => {
-  const student = await ctx.storage.students.findByEmail(ctx.event.data.buyer.email);
+  let student = await ctx.storage.students.findByEmail(ctx.event.data.buyer.email);
 
   if (!student) {
     await ctx.storage.students.preRegister(ctx.event.data.buyer.email, ctx.event.data.purchase.offer.code);
     log(`Pre-registered ${ctx.event.data.buyer.email} for ${ctx.event.data.purchase.offer.code}`);
   }
 
-  if (!student?.welcomeEmailSent) {
+  student = await ctx.storage.students.findByEmail(ctx.event.data.buyer.email);
+
+  if (!student) {
+    throw new Error(
+      `cannot find student ${ctx.event.data.buyer.email} for offer ${ctx.event.data.purchase.offer.code}`,
+    );
+  }
+
+  if (!student.welcomeEmailSent) {
     const inviteLinkId = await ctx.api.createChannelInvite(ctx.config.channelId);
     const inviteLink = `https://discord.gg/${inviteLinkId}`;
-    await ctx.storage.students.completeWelcomeEmail(ctx.event.data.buyer.email);
     const sendEmailResponse = await sendWelcomeEmail(ctx.event.data.buyer.email, inviteLink);
     log(
       `Sent welcome email to ${ctx.event.data.buyer.email}. Response: ${
         JSON.stringify(await sendEmailResponse.json())
       }`,
     );
+    await student.completeWelcomeEmail();
   }
 
   await ghost.addMember(ctx.event.data.buyer.email, ctx.event.data.purchase.offer.code);
@@ -49,7 +57,7 @@ eventComponser.on([EventType.PurchaseProtest, EventType.PurchaseCanceled], async
   const student = await ctx.storage.students.findByEmail(ctx.event.data.buyer.email);
 
   if (student?.discordId) {
-    await ctx.storage.students.unlinkByDiscordId(student.discordId);
+    await student.unlink();
     log(`Unlinked ${student.discordId} from ${ctx.event.data.buyer.email}.`);
 
     await ctx.api.removeUserRoles(
