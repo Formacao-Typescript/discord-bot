@@ -2,7 +2,6 @@ import { ButtonComponent } from "../../util/components/button.ts";
 import { nsDebug } from "../../util/debug.ts";
 import { sendConfirmationEmail } from "../../util/mail.ts";
 import { EPHEMERAL_MESSAGE_FLAG, reply } from "../../util/response.ts";
-import { runWithTimeout } from "../../util/timeout.ts";
 import { ComponentHandler } from "./mod.ts";
 
 const log = nsDebug("components:sendConfirmation");
@@ -54,7 +53,7 @@ export const sendConfirmation: ComponentHandler = {
       preRegisteredUser.tier,
     );
 
-    await runWithTimeout(() => sendEmail(email, code.toUpperCase()), 2000);
+    sendEmail(email, code.toUpperCase());
 
     return reply("Enviamos um email com um código de confirmação. Por favor, verifique sua caixa de entrada.", {
       flags: EPHEMERAL_MESSAGE_FLAG,
