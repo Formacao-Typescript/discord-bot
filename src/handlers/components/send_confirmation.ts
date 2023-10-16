@@ -1,20 +1,11 @@
 import { ButtonComponent } from "../../util/components/button.ts";
-import { nsDebug } from "../../util/debug.ts";
-import { sendConfirmationEmail } from "../../util/mail.ts";
 import { EPHEMERAL_MESSAGE_FLAG, reply } from "../../util/response.ts";
+import { createEmailMessage } from "../../workers/email.ts";
 import { ComponentHandler } from "./mod.ts";
-
-const log = nsDebug("components:sendConfirmation");
-
-const sendEmail = async (email: string, code: string) => {
-  const emailResponse = await sendConfirmationEmail(email, code);
-
-  log(JSON.stringify(await emailResponse.json()));
-};
 
 export const sendConfirmation: ComponentHandler = {
   id: "sendConfirmation",
-  handle: async ({ interaction, storage }) => {
+  handle: async ({ interaction, storage, kv }) => {
     const email = interaction.data?.components?.at(0)?.components
       // deno-lint-ignore no-explicit-any
       ?.find((component: any) => component.custom_id === "emailInput")
@@ -47,13 +38,7 @@ export const sendConfirmation: ComponentHandler = {
       );
     }
 
-    const code = await storage.confirmation.create(
-      `${interaction.member!.user!.id}`,
-      email,
-      preRegisteredUser.tier,
-    );
-
-    sendEmail(email, code.toUpperCase());
+    await kv.enqueue(createEmailMessage(email, `${interaction.member!.user!.id}`, preRegisteredUser.tier));
 
     return reply("Enviamos um email com um código de confirmação. Por favor, verifique sua caixa de entrada.", {
       flags: EPHEMERAL_MESSAGE_FLAG,

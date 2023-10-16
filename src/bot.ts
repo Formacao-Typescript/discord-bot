@@ -4,11 +4,10 @@ import { getCommand } from "./handlers/commands/mod.ts";
 import { getHandler } from "./handlers/components/mod.ts";
 import { Config } from "./util/config.ts";
 import { getStorage } from "./util/db/db.ts";
-import { nsDebug } from "./util/debug.ts";
 import { validateRequestSignature } from "./util/request.ts";
 import { reply } from "./util/response.ts";
 
-const log = nsDebug("bot");
+let kv: Deno.Kv;
 
 export async function handleInteraction(config: Config, request: Request) {
   const api = createApi(config);
@@ -27,12 +26,13 @@ export async function handleInteraction(config: Config, request: Request) {
   }
 
   const storage = await getStorage();
+  kv = kv ?? await Deno.openKv();
 
   switch (interaction.type) {
     case InteractionTypes.ApplicationCommand: {
       const command = getCommand(interaction.data?.name);
 
-      return command.run({ interaction, storage, api });
+      return command.run({ interaction, storage, api, kv });
     }
 
     case InteractionTypes.MessageComponent:
@@ -41,7 +41,7 @@ export async function handleInteraction(config: Config, request: Request) {
       const handler = getHandler(interactionId);
 
       console.time(`Request ${interaction.type} ${interactionId}`);
-      const result = handler.handle({ interaction, storage, api }, interactionId);
+      const result = handler.handle({ interaction, storage, api, kv }, interactionId);
       console.timeEnd(`Request ${interaction.type} ${interactionId}`);
       return result;
     }

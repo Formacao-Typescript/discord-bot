@@ -6,4 +6,5 @@ export type Context = {
   interaction: Interaction & { guild_id: string } & { channel_id: string };
   api: Api;
   storage: Storage;
+  kv: Deno.Kv;
 };
