@@ -40,7 +40,10 @@ export async function handleInteraction(config: Config, request: Request) {
       const interactionId = interaction.data?.custom_id!;
       const handler = getHandler(interactionId);
 
-      return handler.handle({ interaction, storage, api }, interactionId);
+      console.time(`Request ${interaction.type} ${interactionId}`);
+      const result = handler.handle({ interaction, storage, api }, interactionId);
+      console.timeEnd(`Request ${interaction.type} ${interactionId}`);
+      return result;
     }
 
     default:
