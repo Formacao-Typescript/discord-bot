@@ -26,15 +26,12 @@ export async function handleInteraction(config: Config, request: Request) {
     return reply("Fale comigo em um servidor.", { ephemeral: true });
   }
 
-  const startTime = Date.now();
-  log("Handling interaction %s on guild %s", interaction.id, interaction.guild_id);
   const storage = await getStorage();
 
   switch (interaction.type) {
     case InteractionTypes.ApplicationCommand: {
       const command = getCommand(interaction.data?.name);
 
-      log("Done handling interaction %s. Took %s ms", interaction.id, Date.now() - startTime);
       return command.run({ interaction, storage, api });
     }
 
@@ -43,12 +40,10 @@ export async function handleInteraction(config: Config, request: Request) {
       const interactionId = interaction.data?.custom_id!;
       const handler = getHandler(interactionId);
 
-      log("Done handling interaction %s. Took %s ms", interaction.id, Date.now() - startTime);
       return handler.handle({ interaction, storage, api }, interactionId);
     }
 
     default:
-      log("Done handling interaction %s. Took %s ms", interaction.id, Date.now() - startTime);
       return json({ type: InteractionResponseTypes.Pong });
   }
 }
