@@ -9,9 +9,10 @@ const config = await getConfig();
 
 serve({
   "/bot": async (request) => {
-    console.time(`Request ${request.method} ${request.url}`);
+    const startTime = Date.now();
+    console.time(`Request ${request.method} ${request.url} ${startTime}`);
     const result = await handleInteraction(config, request);
-    console.time(`Request ${request.method} ${request.url}`);
+    console.timeEnd(`Request ${request.method} ${request.url} ${startTime}`);
     return result;
   },
   "/webhook": (request) => handleWebhookRequest(config, request),
