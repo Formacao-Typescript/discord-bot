@@ -88,9 +88,10 @@ export const addMemberLabels = (member: any, offer: string) => {
   const newLabels = getLabelsForOffer(offer);
 
   const labels = [...member.labels, ...newLabels];
+  const date = new Date().toLocaleDateString("pt", { day: "2-digit", month: "2-digit", year: "numeric" });
 
   return sendRequest("PUT", `members/${member.id}`, {
-    members: [{ ...member, labels }],
+    members: [{ ...member, labels, note: member.note ?? `Atualizado pelo James em ${date}` }],
   });
 };
 
