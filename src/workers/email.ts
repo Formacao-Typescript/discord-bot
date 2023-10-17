@@ -1,6 +1,8 @@
 import { z } from "../deps.ts";
 import { getStorage } from "../util/db/db.ts";
+import { nsDebug } from "../util/debug.ts";
 import { sendConfirmationEmail } from "../util/mail.ts";
+const log = nsDebug("workers:email");
 
 const EmailMessage = z.object({
   type: z.literal("sendConfirmationCode"),
@@ -25,7 +27,14 @@ export const emailQueueWorker = async (message: unknown) => {
 
   const { email, userId, tier } = message;
 
+  log(`Sending confirmation email to ${email} for user ${userId} with tier ${tier}`);
+
   const storage = getStorage();
   const code = await storage.confirmation.create(userId, email, tier);
+
+  log(`Created confirmation code ${code} for user ${userId} with tier ${tier}`);
+
   await sendConfirmationEmail(email, code);
+
+  log(`Sent confirmation email to ${email} for user ${userId} with tier ${tier}`);
 };
