@@ -99,11 +99,14 @@ export const addMember = async (email: string, offer: string) => {
 
   if (member) return addMemberLabels(member, offer);
 
+  const date = new Date().toLocaleDateString("pt", { day: "2-digit", month: "2-digit", year: "numeric" });
+
   return sendRequest("POST", "members", {
     members: [{
       email,
       newsletters: [{ id: config.ghostNewsletterId }],
       labels: getLabelsForOffer(offer),
+      note: `Adicionado no dia ${date} pela integração da Hotmart com o James`,
     }],
   });
 };
