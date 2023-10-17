@@ -23,7 +23,13 @@ export const createEmailMessage = (email: string, userId: string, tier: string):
 const isValidMessage = (message: unknown): message is EmailMessage => EmailMessage.safeParse(message).success;
 
 export const emailQueueWorker = async (message: unknown) => {
-  if (!isValidMessage(message)) return;
+  log("Received message", message);
+  if (!isValidMessage(message)) {
+    log("Invalid message. Skipping");
+    return;
+  }
+
+  log("Valid message. Processing");
 
   const { email, userId, tier } = message;
 

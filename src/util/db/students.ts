@@ -32,32 +32,35 @@ function createStudent(email: string, tier: string): Student {
 }
 
 function hydrateStudent(students: Collection<Student>) {
-  return (student: Student) => ({
-    ...student,
-    remove: () => students.deleteOne({ email: student.email }),
-    strike: () =>
-      students.updateOne(
-        { email: student.email },
-        { $inc: { strikes: 1 }, $set: { lastStrike: new Date() } },
-      ),
-    remind: () =>
-      students.updateOne(
-        { email: student.email },
-        { $inc: { reminders: 1 }, $set: { lastReminder: new Date() } },
-      ),
-    setInviteLink: (inviteLink: string) =>
-      students.updateOne(
-        { email: student.email },
-        { $set: { discordInviteLink: inviteLink } },
-      ),
-    completeRegister: (discordId: string) =>
-      students.updateOne(
-        { email: student.email },
-        { $set: { discordId, linkedAt: new Date() } },
-      ),
-    unlink: () => students.updateOne({ email: student.email }, { $set: { discordId: "", linkedAt: null } }),
-    completeWelcomeEmail: () => students.updateOne({ email: student.email }, { $set: { welcomeEmailSent: true } }),
-  });
+  return (student: Student) => {
+    if (!student) return null;
+    return {
+      ...student,
+      remove: () => students.deleteOne({ email: student.email }),
+      strike: () =>
+        students.updateOne(
+          { email: student.email },
+          { $inc: { strikes: 1 }, $set: { lastStrike: new Date() } },
+        ),
+      remind: () =>
+        students.updateOne(
+          { email: student.email },
+          { $inc: { reminders: 1 }, $set: { lastReminder: new Date() } },
+        ),
+      setInviteLink: (inviteLink: string) =>
+        students.updateOne(
+          { email: student.email },
+          { $set: { discordInviteLink: inviteLink } },
+        ),
+      completeRegister: (discordId: string) =>
+        students.updateOne(
+          { email: student.email },
+          { $set: { discordId, linkedAt: new Date() } },
+        ),
+      unlink: () => students.updateOne({ email: student.email }, { $set: { discordId: "", linkedAt: null } }),
+      completeWelcomeEmail: () => students.updateOne({ email: student.email }, { $set: { welcomeEmailSent: true } }),
+    };
+  };
 }
 
 export type HydratedStudent = ReturnType<ReturnType<typeof hydrateStudent>>;
@@ -86,8 +89,11 @@ export function getStudentRepository(client: MongoClient) {
         .then((count) => count > 0);
     },
     preRegister: async (email: string, tier = "free") => {
+      const existingStudent = await students.findOne({ email, discordId: "" });
+      if (existingStudent) return hydrate(existingStudent);
+
       const student = createStudent(email, tier);
-      await students.updateOne(student, { upsert: true });
+      await students.insertOne(student);
       return hydrate(student);
     },
     unlinkByDiscordId: (discordId: string) => {
