@@ -25,7 +25,7 @@ export async function handleInteraction(config: Config, request: Request) {
     return reply("Fale comigo em um servidor.", { ephemeral: true });
   }
 
-  const storage = await getStorage();
+  const storage = getStorage();
   kv = kv ?? await Deno.openKv();
 
   switch (interaction.type) {

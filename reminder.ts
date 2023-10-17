@@ -4,7 +4,7 @@ import { getStorage } from "./src/util/db/db.ts";
 import { sendReminderEmail } from "./src/util/mail.ts";
 const config = getConfig();
 
-const storage = await getStorage();
+const storage = getStorage();
 const DAYS_BEFORE_FIRST_REMINDER = 7;
 const DAYS_BETWEEN_EACH_REMINDER = 3;
 const REMINDER_TEMPLATES = [
