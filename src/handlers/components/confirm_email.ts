@@ -30,6 +30,12 @@ export const confirmEmail: ComponentHandler = {
 
     const student = await storage.students.findPreRegistered(email);
 
+    if (!student) {
+      return reply("Usuário não encontrado. Por favor, entre em contato com um admin.", {
+        flags: EPHEMERAL_MESSAGE_FLAG,
+      });
+    }
+
     await Promise.all([
       storage.confirmation.consume(confirmationCode),
       student.completeRegister(userId),

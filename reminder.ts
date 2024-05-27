@@ -1,4 +1,4 @@
-import { ptera } from "./src/deps.ts";
+import { ptera } from "deps.ts";
 import { getConfig } from "./src/util/config.ts";
 import { getStorage } from "./src/util/db/db.ts";
 import { sendReminderEmail } from "./src/util/mail.ts";
@@ -13,7 +13,10 @@ const REMINDER_TEMPLATES = [
   "third",
 ] as const;
 
-for await (const student of storage.students.list({ discordId: "" })) {
+const students = storage.students.list({ discordId: "" }) ?? [];
+
+for await (const student of students) {
+  if (!student) continue;
   const createdAt = ptera.datetime(student.createdAt);
   const daysSinceCreated = ptera.diffInDays(createdAt, ptera.DateTime.now());
 

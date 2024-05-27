@@ -1,5 +1,4 @@
-import { MongoClient } from "deps.ts";
-import { Collection } from "https://deno.land/x/atlas_sdk@v1.1.1/mod.ts";
+import { Collection, MongoClient } from "deps.ts";
 
 export type Student = {
   email: string;

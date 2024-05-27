@@ -1,4 +1,4 @@
-import { Composer, Middleware } from "../deps.ts";
+import { Composer, Middleware } from "deps.ts";
 import { Event, EventType } from "./db/events.ts";
 
 type MaybeArray<T> = T | Array<T>;

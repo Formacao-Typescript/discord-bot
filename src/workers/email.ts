@@ -1,4 +1,4 @@
-import { z } from "../deps.ts";
+import { z } from "deps.ts";
 import { getStorage } from "../util/db/db.ts";
 import { nsDebug } from "../util/debug.ts";
 import { sendConfirmationEmail } from "../util/mail.ts";

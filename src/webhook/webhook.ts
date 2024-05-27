@@ -1,11 +1,10 @@
-import { json } from "deps.ts";
+import { ButtonStyles, json } from "deps.ts";
 import { createApi } from "../api.ts";
+import { ButtonComponent } from "../util/components/button.ts";
 import { Config, getConfig } from "../util/config.ts";
 import { getStorage } from "../util/db/db.ts";
 import { Event } from "../util/db/events.ts";
 import { eventComponser } from "./composer.ts";
-import { ButtonComponent } from "../util/components/button.ts";
-import { ButtonStyles } from "https://deno.land/x/discordeno@18.0.1/mod.ts";
 
 const config = await getConfig();
 

@@ -1,5 +1,5 @@
 import { Api } from "../api.ts";
-import { Interaction } from "../deps.ts";
+import { Interaction } from "deps.ts";
 import { Storage } from "../util/db/db.ts";
 
 export type Context = {

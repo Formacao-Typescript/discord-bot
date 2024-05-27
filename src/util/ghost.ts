@@ -1,9 +1,8 @@
-import { decode } from "https://deno.land/std@0.199.0/encoding/hex.ts";
-import { create, getNumericDate } from "https://deno.land/x/djwt@v2.9.1/mod.ts";
+import { create, decode, getNumericDate } from "deps.ts";
 import { getConfig } from "./config.ts";
 import { nsDebug } from "./debug.ts";
 const BASE_URL = "https://blog.lsantos.dev/ghost/api/admin/";
-const config = await getConfig();
+const config = getConfig();
 
 const log = nsDebug("ghost");
 

@@ -1,4 +1,4 @@
-import Mailgun from "https://deno.land/x/mailgun@v1.2.1/index.ts";
+import { Mailgun } from "deps.ts";
 import { getConfig } from "./config.ts";
 
 const config = await getConfig();
