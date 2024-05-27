@@ -6,7 +6,7 @@
   "tasks": {
     "start": "deno run --allow-net --allow-env --allow-read=.env,.env.defaults,.env.example src/mod.ts",
     "dev": "deno check src/mod.ts && deno fmt && DEBUG='*' PORT=3000 deno run -A --unstable --watch src/mod.ts",
-    "commands": "deno run -A src/create-commands.ts",
+    "commands": "deno run -A src/domains/discord/bot/create-commands.ts",
     "check": "deno fmt && deno check src/mod.ts && deno lint",
     "udd": "deno run -A https://deno.land/x/udd/main.ts src/deps.ts",
     "recache": "rm deno.lock && deno cache --reload src/deps.ts",
